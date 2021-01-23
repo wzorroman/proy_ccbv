@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 10px;
+}
+</style>
+</head>
+<body>
+{% if messages %}
+<div class="row">
+    <br/>
+    <div class="col-md-12">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<h3>Lista de encuestas</h3>
+<hr>
+{% if user.is_authenticated %}
+    Hi <strong>{{ user.username }}!</strong>
+    <ul>
+        <li><a href="{ % url 'home' % }"> INICIO</a></li>
+        <li><a href="{% url 'logout' %}">Salir</a></li>
+    </ul>
+    <hr>
+    <table border="1" style="col:2%;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>titulo</th>
+                <th>descripcion</th>
+                <th>created</th>
+                <th>modified</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+    {% for item in object_list %}
+        <tbody>
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.titulo }}</td>
+                <td>{{ item.descripcion|default_if_none:'-' }}</td>
+                <td>
+                    {{ item.creado|date:'d/m/Y H:i:s' }}
+                </td>
+                <td>
+                    {{ item.actualizado|date:'d/m/Y H:i:s' }}
+                </td>
+                <td>
+                    <a href = '{% url "pregunta_list" item.id %}'>Ver preguntas</a>
+                </td>                
+            </tr>
+
+        </tbody>
+        
+    {% endfor %}   
+    </table>
+{% else %}
+    <p>Debes loguearte para acceder a los datos</p>
+    <a href="{% url 'login' %}">login</a>
+    <br>
+{% endif %}
+</body>

@@ -1,0 +1,72 @@
+{% if messages %}
+<div class="row">
+    <br/>
+    <div class="col-md-12">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<h3>{{ titulo }}</h3>
+<hr>
+{% if user.is_authenticated %}
+    Hi <strong>{{ user.username }}!</strong>
+    <ul>
+        <li><a href="{% url 'encuesta_list' %}"> REGRESAR LISTADO </a></li>
+    </ul>
+    <hr>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Pregunta</th>
+                <th>Previa</th>
+                <th>Siguiente</th>
+                <th>created</th>
+                <th>modified</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+    {% for item in listado %}
+        <tbody style="padding: 10px;">
+            <tr style="background-color:#d3d3d3;">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.pregunta }}</td>
+                <td>{{ item.pregunta_previa|default_if_none:'-' }}</td>
+                <td>{{ item.pregunta_sgte|default_if_none:'-' }}</td>
+                <td>
+                    {{ item.creado|date:'d/m/Y H:i:s' }}
+                </td>
+                <td>
+                    {{ item.actualizado|date:'d/m/Y H:i:s' }}
+                </td>
+                <td>
+                    <a href = '{% url "respuesta_add" item.encuesta.id item.id %}'>Responder</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="5"><u>Respuestas</u></td>
+            </tr>
+            {% for rpta in item.respuesta_set.all %}
+            <tr>
+                <td colspan="2"></td>
+                <td><b>Usuario:</b></td>
+                <td>{{ rpta.usuario.username }} <i>({{ rpta.actualizado|date:'d/m/Y H:i:s' }})</i></td>
+                <td>{{ rpta.respuesta }}</td>
+                <td><a href = '{% url "respuesta_edit" item.encuesta.id item.id rpta.id %}'>Editar</a></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr><td colspan="7">&nbsp;</td></tr>
+        </tbody>
+        
+    {% endfor %}   
+    </table>
+{% else %}
+    <p>Debes loguearte para acceder a los datos</p>
+    <a href="{% url 'login' %}">login</a>
+    <br>
+{% endif %}
